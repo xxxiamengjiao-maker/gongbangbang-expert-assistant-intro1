@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>行家助手 · 智能查询机器人</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: #f5f6fa;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    /* ===== HERO - 星空科技感 ===== */
+    .hero {
+      background: #050d1a;
+      padding: 52px 20px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .stars { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .star {
+      position: absolute; border-radius: 50%; background: #fff;
+      animation: twinkle var(--d, 3s) ease-in-out infinite; opacity: 0;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: 0; transform: scale(0.8); }
+      50% { opacity: var(--o, 0.8); transform: scale(1.2); }
+    }
+    .glow-1 {
+      position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(22,119,255,0.25) 0%, transparent 70%);
+      top: -180px; left: -100px; pointer-events: none;
+    }
+    .glow-2 {
+      position: absolute; width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(22,119,255,0.2) 0%, transparent 70%);
+      bottom: -160px; right: -80px; pointer-events: none;
+    }
+    .glow-3 {
+      position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(22,119,255,0.18) 0%, transparent 70%);
+      top: 30px; right: 10%; pointer-events: none;
+    }
+    .beam {
+      position: absolute; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(22,119,255,0.6), transparent);
+      pointer-events: none;
+      animation: beam-move 4s ease-in-out infinite;
+    }
+    .beam-1 { width: 60%; top: 30%; left: -10%; animation-delay: 0s; }
+    .beam-2 { width: 40%; top: 60%; right: -5%; animation-delay: 1.5s; }
+    @keyframes beam-move {
+      0% { opacity: 0; transform: translateX(-30px); }
+      30% { opacity: 1; } 70% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(30px); }
+    }
+    .hero-content { position: relative; z-index: 2; }
+    .hero-robot {
+      font-size: 56px; margin-bottom: 14px; display: block;
+      filter: drop-shadow(0 0 20px rgba(22,119,255,0.8)) drop-shadow(0 0 40px rgba(22,119,255,0.4));
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .hero h1 {
+      font-size: 28px; font-weight: 800; color: #fff;
+      letter-spacing: 3px; margin-bottom: 10px;
+      text-shadow: 0 0 30px rgba(22,119,255,0.6);
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, #1677ff, #40a9ff, #1677ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; padding: 0 4px;
+    }
+    .hero-desc {
+      font-size: 14px; color: rgba(255,255,255,0.65);
+      line-height: 1.9; max-width: 400px; margin: 0 auto 24px;
+    }
+    .hero-desc strong { color: #40a9ff; }
+    .how-wrap {
+      max-width: 520px; margin: 0 auto;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(22,119,255,0.35);
+      border-radius: 18px; padding: 20px 22px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(22,119,255,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .how-wrap h2 {
+      font-size: 14px; font-weight: 700; color: #69b1ff;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+    }
+    .steps { display: flex; gap: 0; align-items: flex-start; }
+    .step-item { flex: 1; text-align: center; position: relative; }
+    .step-item:not(:last-child)::after {
+      content: '→'; position: absolute; right: -8px; top: 8px;
+      color: rgba(22,119,255,0.6); font-size: 14px;
+    }
+    .step-num {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #1677ff, #40a9ff);
+      color: #fff; font-size: 13px; font-weight: 800; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 7px; box-shadow: 0 0 12px rgba(22,119,255,0.5);
+    }
+    .step-text { font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+    .how-example {
+      margin-top: 14px;
+      background: rgba(22,119,255,0.12);
+      border: 1px solid rgba(22,119,255,0.25);
+      border-radius: 8px; padding: 8px 12px;
+      font-size: 12.5px; color: rgba(255,255,255,0.8); text-align: center;
+    }
+    .how-example code {
+      background: rgba(22,119,255,0.25); padding: 1px 7px; border-radius: 4px;
+      font-family: monospace; font-size: 12px; color: #69b1ff;
+    }
+
+    /* ===== CAPS ===== */
+    .caps {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; padding: 26px 16px 0;
+      max-width: 700px; margin: 0 auto;
+    }
+    .cap-pill {
+      background: #fff; border: 1.5px solid #e8e8e8; border-radius: 24px;
+      padding: 6px 14px; font-size: 13px; color: #444;
+      display: flex; align-items: center; gap: 5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: all 0.2s; cursor: default;
+    }
+    .cap-pill:hover {
+      background: linear-gradient(135deg, #1677ff, #40a9ff);
+      border-color: transparent; color: #fff;
+      box-shadow: 0 4px 14px rgba(22,119,255,0.35);
+      transform: translateY(-1px);
+    }
+
+    /* ===== SECTION TITLE ===== */
+    .section-title { text-align: center; padding: 32px 16px 20px; }
+    .section-title h2 { font-size: 20px; font-weight: 800; color: #1a1a2e; }
+    .section-title h2 span {
+      background: linear-gradient(135deg, #1677ff, #40a9ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .section-title p { font-size: 13px; color: #888; margin-top: 6px; }
+
+    /* ===== CARDS ===== */
+    .cards-wrap {
+      max-width: 980px; margin: 0 auto;
+      padding: 0 16px 60px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+    .scene-card {
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07); overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .scene-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.11);
+    }
+    .card-head {
+      display: flex; align-items: center; gap: 14px;
+      padding: 20px 24px 16px; border-bottom: 1px solid #f0f0f0;
+    }
+    .card-icon-wrap {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .ic-green  { background: #e8f9ef; }
+    .ic-blue   { background: #e8f1ff; }
+    .ic-orange { background: #fff3e8; }
+    .ic-purple { background: #f3e8ff; }
+    .ic-teal   { background: #e8f9f7; }
+    .ic-red    { background: #ffe8e8; }
+    .card-head-info h3 { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+    .card-head-info p  { font-size: 12.5px; color: #888; margin-top: 3px; }
+    .card-badge {
+      margin-left: auto;
+      background: linear-gradient(135deg, #e6f4ff, #bae0ff);
+      color: #1677ff; font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 12px; white-space: nowrap;
+    }
+    .card-body { padding: 20px 24px; }
+    .card-body.two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 640px) { .card-body.two-col { grid-template-columns: 1fr; } }
+    .sub-scene { display: flex; flex-direction: column; gap: 10px; }
+    .sub-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: #333;
+    }
+    .sub-label .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: linear-gradient(135deg, #1677ff, #40a9ff); flex-shrink: 0;
+    }
+    .sub-label .tag {
+      background: #f0f0f0; color: #666; font-size: 11px; font-weight: 500;
+      padding: 2px 8px; border-radius: 6px;
+    }
+    .ask-box {
+      background: #f8f9fb; border-radius: 10px; padding: 10px 14px;
+      font-size: 12.5px; color: #555; line-height: 1.7;
+      border-left: 3px solid #1677ff;
+    }
+    .ask-box .ask-label {
+      font-size: 11px; color: #1677ff; font-weight: 600; margin-bottom: 4px;
+    }
+    .ask-box code {
+      background: #fff; border: 1px solid #e0e0e0;
+      padding: 1px 6px; border-radius: 4px;
+      font-family: monospace; font-size: 12px; color: #333;
+    }
+    .screenshot-wrap {
+      border-radius: 12px; overflow: hidden;
+      border: 1px solid #eee; background: #f5f5f5; position: relative;
+    }
+    .screenshot-wrap img { width: 100%; display: block; object-fit: cover; }
+    .screenshot-wrap .img-label {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(0,0,0,0.5); color: #fff; font-size: 11px;
+      padding: 2px 8px; border-radius: 6px; backdrop-filter: blur(4px);
+    }
+    .single-scene {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;
+    }
+    @media (max-width: 640px) { .single-scene { grid-template-columns: 1fr; } }
+    .single-scene .left { display: flex; flex-direction: column; gap: 12px; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: #050d1a; padding: 36px 20px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .footer .glow-f {
+      position: absolute; width: 400px; height: 200px;
+      background: radial-gradient(ellipse, rgba(22,119,255,0.2) 0%, transparent 70%);
+      top: -60px; left: 50%; transform: translateX(-50%); pointer-events: none;
+    }
+    .footer h3 {
+      font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px;
+      position: relative; z-index: 1;
+      text-shadow: 0 0 20px rgba(22,119,255,0.5);
+    }
+    .footer p {
+      font-size: 13px; color: rgba(255,255,255,0.6);
+      line-height: 1.9; position: relative; z-index: 1;
+    }
+    .footer .at-btn {
+      display: inline-block; margin-top: 18px;
+      background: linear-gradient(135deg, #1677ff, #40a9ff);
+      color: #fff; font-size: 15px; font-weight: 700;
+      padding: 11px 32px; border-radius: 24px; letter-spacing: 1px;
+      box-shadow: 0 4px 20px rgba(22,119,255,0.45);
+      position: relative; z-index: 1;
+      transition: transform 0.2s, box-shadow 0.2s; cursor: default;
+    }
+    .footer .at-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(22,119,255,0.55);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HERO ===== -->
+  <div class="hero">
+    <div class="stars" id="stars"></div>
+    <div class="glow-1"></div><div class="glow-2"></div><div class="glow-3"></div>
+    <div class="beam beam-1"></div><div class="beam beam-2"></div>
+    <div class="hero-content">
+      <span class="hero-robot">🤖</span>
+      <h1>群里的 <em>行家助手</em></h1>
+      <p class="hero-desc">智能查询机器人，@它就能直接查询，不用等客服回复，<strong>秒出结果，全天候在线！</strong></p>
+      <div class="how-wrap">
+        <h2>⚡ 怎么用？超简单</h2>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-text">群里输入<br/><strong style="color:#69b1ff">@行家助手</strong></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-text">空格后写<br/>要查的内容</div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-text">发送<br/><strong style="color:#69b1ff">机器人秒回</strong></div>
+          </div>
+        </div>
+        <div class="how-example">
+          💬 示例：<code>@行家助手 查物流 订单号XXXX</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CAPS ===== -->
+  <div class="caps">
+    <div class="cap-pill">📦 找货</div>
+    <div class="cap-pill">🚚 查物流</div>
+    <div class="cap-pill">📋 查送货单</div>
+    <div class="cap-pill">🧾 查发票</div>
+    <div class="cap-pill">📬 自动推送发票</div>
+    <div class="cap-pill">⏱ 查交期</div>
+    <div class="cap-pill">📄 查MSDS/TDS</div>
+  </div>
+
+  <!-- ===== SECTION TITLE ===== -->
+  <div class="section-title">
+    <h2>🔍 <span>8大场景</span>，覆盖日常采购全流程</h2>
+    <p>结合真实使用截图，一看就懂</p>
+  </div>
+
+  <!-- ===== CARDS ===== -->
+  <div class="cards-wrap">
+
+    <!-- ① 搜索找货 -->
+    <div class="scene-card">
+      <div class="card-head">
+        <div class="card-icon-wrap ic-green">📦</div>
+        <div class="card-head-info">
+          <h3>场景一：搜索找货</h3>
+          <p>支持文字描述找货 & 发图片找货，快速匹配商品</p>
+        </div>
+        <div class="card-badge">2种方式</div>
+      </div>
+      <div class="card-body two-col">
+        <div class="sub-scene">
+          <div class="sub-label"><div class="dot"></div>文字搜索找货<span class="tag">发名称/型号</span></div>
+          <div class="ask-box">
+            <div class="ask-label">📝 问法示例</div>
+            <code>@行家助手 给我推荐一个空气开关</code><br/>
+            <code>@行家助手 AA7050</code>
+          </div>
+          <div class="screenshot-wrap">
+            <div class="img-label">真实效果</div>
+            <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/207821935/6u3OOra23NJKpPVi.png?Expires=1792650757&Signature=cmQY~RPUuBRuDJg8tNYjIYCNyVjweMPBNgV9I~ivsP5Sj6uuI7o8G1lOat2YKPitIux2oEga~Z4UkWIrKNeX3gFR-YDoK-Mi2PqPWPbSUNh7VdzPvOWJ6oT3VBn6Zrmj-kKV7LT7ZQE9Pm0OYPZC6D70pBRSrWArkRUIOl4tGFHKXokCVSOHAmpbwnLAJTngBoSvpj2kFZYv9U~l52a8J830vG03fa2lAwC-~OA~FK8MgGOs~R6YZmlmTH7FNR0bLzYIOOWBd6kxneFwAJHG0MNcvGXXyC9w-PRPpRWouVKn451Vx7bFZ7Y9Hggzt6m3w0uIiAe7OBoLX-J42Pt~XQ__&Key-Pair-Id=K3USGZIKWMDCSX" alt="文字找货"/>
+          </div>
+        </div>
+        <div class="sub-scene">
+          <div class="sub-label"><div class="dot"></div>图片搜索找货<span class="tag">发图片</span></div>
+          <div class="ask-box">
+            <div class="ask-label">📝 问法示例</div>
+            先发商品图片，再@助手：<br/>
+            <code>【发图片】+ @行家助手 找商品</code>
+          </div>
+          <div class="screenshot-wrap">
+            <div class="img-label">真实效果</div>
+            <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/207821935/MOhxEeEWFuRkzKy5.png?Expires=1792650779&Signature=B~bUuyH06lkcJ3CUqO7ynYhYfSRRImYS0JsDvHv2F5ee8CJjsxtJo4Zy6Mwmg204LWdDhIxox0nFwTb7WTkV4F3IcjTXU6-TLhwsRoMlBKrhtucQS93dgkZbGdPl6nTyJegGH4x8xOz1UAp09eXATayiqoAYH3rDR6qZ8G3GZWVKX8SfZcXDddwLymh1rRTWesZvZc6KlM4boK~cgvQ17DgTGOgPDC5hojl4CuV7RV~81FXA-b0Gxi7gF~cHm5zLEFX6abOMlifrDX6aUu8BORPhowezYe5TUFCWqT2wPvFaNmcZ42Y3Zz1bWK3uiBgpyI-fb~Dq~EDzEkQi8rjcvg__&Key-Pair-Id=K3USGZIKWMDCSX" alt="图片找货"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② 查询送货单 -->
+    <div class="scene-card">
+      <div class="card-head">
+        <div class="card-icon-wrap ic-blue">📋</div>
+        <div class="card-head-info">
+          <h3>场景二：查询送货单</h3>
+          <p>发送货单号，秒导出PDF送货单文件</p>
+        </div>
+        <div class="card-badge">秒出PDF</div>
+      </div>
+      <div class="card-body">
+        <div class="single-scene">
+          <div class="left">
+            <div class="ask-box">
+              <div class="ask-label">📝 问法示例</div>
+              <code>@行家助手 2038197668 导出送货单</code><br/>
+              <code>@行家助手 VC-SHD-XXXX 导出送货单</code>
+            </div>
+            <div class="ask-box" style="border-left-color:#576b95;background:#f0f3ff;">
+              <div class="ask-label" style="color:#576b95;">💡 支持格式</div>
+              数字单号 / VC-SHD-开头单号均可查询
+            </div>
+          </div>
+          <div class="screenshot-wrap">
+            <div class="img-label">真实效果</div>
+            <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/207821935/0NhLJCWHnQ76h4DX.png?Expires=1792650948&Signature=QEsBUj6BHtxFBD6BfNV1sU26BW8RhDzsuDa76XABkWhZF8aM4jdejrP0pUqIC6OHSUKUW6S4SKBCkVVWMU5bTan~gU3fV5BWnfRa3KgTGW0SSDBmxruFXLVYWi32B~37vxOrv8eZZRp12x5kqmbXePNiGz793TcGOvdVPsp4KKMdauZNBoz4lMy35WYYNAO23SbHTJkrTKP~MHav5BiXe40ovPACRtbhBvnZIX6IgFqyK06--pNambpj54pg0zJCaR48nbF1u3xbXWskrq1G-MbmyM1rm6hjlroJuMeNU9z29ZcrvZgUgaajQbL76EZRS~Q4SM81~fRnUjeb8soXJw__&Key-Pair-Id=K3USGZIKWMDCSX" alt="查送货单"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 查询订单物流 -->
+    <div class="scene-card">
+      <div class="card-head">
+        <div class="card-icon-wrap ic-orange">🚚</div>
+        <div class="card-head-info">
+          <h3>场景三：查询订单物流</h3>
+          <p>发订单号，实时查看发货状态与物流节点</p>
+        </div>
+        <div class="card-badge">实时物流</div>
+      </div>
+      <div class="card-body">
+        <div class="single-scene">
+          <div class="left">
+            <div class="ask-box">
+              <div class="ask-label">📝 问法示例</div>
+              <code>@行家助手 5125297428050018041 这个订单发货了吗</code>
+            </div>
+            <div class="ask-box" style="border-left-color:#f39c12;background:#fffbf0;">
+              <div class="ask-label" style="color:#f39c12;">📦 返回信息包含</div>
+              订单日期 · 商品明细 · 发货状态<br/>
+              运单号 · 物流公司 · 当前节点
+            </div>
+          </div>
+          <div class="screenshot-wrap">
+            <div class="img-label">真实效果</div>
+            <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/207821935/rZ5WAsutohDiBLHi.png?Expires=1792651036&Signature=HEYPWQfNud5p5sEHnQGY8r~eS7WY6pHR~jPRGcIXDLfhfLle4gda4IT6q6eo4OV68NV-KUgvDFRsxnxvPfFYfZrHLpPvJmvw6uJ95QSW~yYfqiV~s0PsBYyrgarcnAnnF5Pruf0xupYhAaOiu-UZc~RauKi7zk-QhU2ZP3Tl0dahMrvuIxtMx~bJbnWaxoMLBTgP9F8sU1RFqX4V80i8XmjAPu~DN6wleOOeiF3cLxsFR5sglNkuGsJxZ8uzQ79ujUj6-jJYBueQtKwBIu0Hon5y8YTIDmbOS~2L0ih0myz8c~G3CqK6LIIfzKJxec8IfIBxKTHeNKabCrNSzAZMdw__&Key-Pair-Id=K3USGZIKWMDCSX" alt="查物流"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④⑤ 发票两个场景 -->
+    <div class="scene-card">
+      <div class="card-head">
+        <div class="card-icon-wrap ic-purple">🧾</div>
+        <div class="card-head-info">
+          <h3>场景四 & 五：电子发票</h3>
+          <p>主动查询发票 + 开票后自动推送，双重保障不漏票</p>
+        </div>
+        <div class="card-badge">2种方式</div>
+      </div>
+      <div class="card-body two-col">
+        <div class="sub-scene">
+          <div class="sub-label"><div class="dot"></div>主动查询电子发票<span class="tag">发订单号</span></div>
+          <div class="ask-box">
+            <div class="ask-label">📝 问法示例</div>
+            发订单号，帮您查发票信息：<br/>
+            <code>@行家助手 查发票 订单号:XXXX</code>
+          </div>
+          <div class="screenshot-wrap">
+            <div class="img-label">真实效果</div>
+            <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/207821935/zypKHCk01qBkNaau.png?Expires=1792651188&Signature=Wt0kVBft~8UH2gvd2OYj8FHRAyAnu39~o0nqkWtvKyeSvzWWuWU-UAtQoPhzRFFpiGBFm3NABYW1q4p-xAqh3UnmWgHtFXvy0UqPPyHYk7tz5h6YWegLTnuxfxY-LFZSyYlqcXiui-Pp4H565Ufj7v0Ba0jsTGqdYX2FYPzW0ivzG47jhGrwwTdbyoGh0ErWKs70VNXNWKpSXb-P7vOO1YIXep3HX1uLR5jy87J4CbyK-jcIcEJYhdGdJj0vrMbwbLZxV2LZlTWFZYP2mp8MCm4ouEUztZZRrth1RnjQn6v15l7HFB-PLYjeZHhtNnF5s7NzE8zywBIj4T6Loxayog__&Key-Pair-Id=K3USGZIKWMDCSX" alt="查发票"/>
+          </div>
+        </div>
+        <div class="sub-scene">
+          <div class="sub-label"><div class="dot"></div>开票后自动推送<span class="tag">无需操作</span></div>
+          <div class="ask-box" style="border-left-color:#9b59b6;background:#f9f0ff;">
+            <div class="ask-label" style="color:#9b59b6;">✨ 自动推送机制</div>
+            每个工作日，行家助手会自动将<strong>前一工作日已开具的发票</strong>推送到群里，附带下载链接和PDF文件，<strong>不用担心漏掉任何一张发票！</strong>
+          </div>
+          <div class="screenshot-wrap">
+            <div class="img-label">真实效果</div>
+            <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/207821935/GF8FZT4JdK2iJkIw.jpg?Expires=1792652264&Signature=Jokfu7ZrIt2ejSyh1wp~HeZ8uKjsWuzgs8Kp8FWfWAeQzdiaLeI-SlvX~xBDDNdQgQ8gK8CE4yys7Bm1NHhySHDmip5Ko-CrAxwKIBNPe1IGntfMxliV9MrZ1amJAiw9R7aYudtnM9QedU1ItLtPbt5HSwGvlTf1bNSfpYsG0PArkqK286X9-IQzBIKK-8s6qC~1XtxYWZLQNtx1veprcWBrzlMJG1KlJGY4-EoW5hpJjJvvHLBvsx9PG4J-AW8ll1dfadLykGvbdD4tpLfXGhquoCB5qYcsCASCl1ZlKm4DZi6mmS1WqDAOgh-BkKhV276c-JdtSGRXRNe3jijJBg__&Key-Pair-Id=K3USGZIKWMDCSX" alt="自动推送发票"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ 查询SKU交期 -->
+    <div class="scene-card">
+      <div class="card-head">
+        <div class="card-icon-wrap ic-teal">⏱️</div>
+        <div class="card-head-info">
+          <h3>场景六：查询SKU交期</h3>
+          <p>发SKU编号 + 数量 + 收货地，预估发货与到货时间</p>
+        </div>
+        <div class="card-badge">预估交期</div>
+      </div>
+      <div class="card-body">
+        <div class="single-scene">
+          <div class="left">
+            <div class="ask-box">
+              <div class="ask-label">📝 问法示例</div>
+              <code>@行家助手 AA1802 10个 送到北京要多久</code>
+            </div>
+            <div class="ask-box" style="border-left-color:#1abc9c;background:#f0fdfb;">
+              <div class="ask-label" style="color:#1abc9c;">📦 返回信息包含</div>
+              预计发货日 · 预计送达日<br/>
+              发货地 · 起订量 · 商品链接
+            </div>
+          </div>
+          <div class="screenshot-wrap">
+            <div class="img-label">真实效果</div>
+            <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/207821935/HmdjdGa4Hby3WgNZ.png?Expires=1792651532&Signature=lahmde7aOopsyQP2WqdfwrKCXCSQWk22NdDrjWqXv2wp6DrpqG9l~lrvemjo4mr1cN9u9iLpTHDOGcIM6PC47xi1-TH8Vk8mIeMNEpWjXeltJcA-VngBmhTIrU0cN3EC6muX5F0K6iLq9OLVKHwfEFICzHWl2eXhOz~ZPtB6DgSL5hQAmUwfnxPUDJnbCVcyG45U6DdlOx3GYwa9W75lU8KutI6Mc8rEZhtIDW-wggi9ZnWvVShCXPSZxKQKpWXmBzpENORCCrBAIdtyLuF4myisqiDtlKGVZp4LPdN6Yus5CD6cS-eTYfqsJfZ0OxEbUjjMXtI40Ky1L-vM0XnRtw__&Key-Pair-Id=K3USGZIKWMDCSX" alt="查交期"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑦ 查询MSDS/TDS -->
+    <div class="scene-card">
+      <div class="card-head">
+        <div class="card-icon-wrap ic-red">📄</div>
+        <div class="card-head-info">
+          <h3>场景七：查询 MSDS / TDS 文件</h3>
+          <p>发SKU编号，获取商品安全数据表或技术规格文件</p>
+        </div>
+        <div class="card-badge">秒获文件</div>
+      </div>
+      <div class="card-body">
+        <div class="single-scene">
+          <div class="left">
+            <div class="ask-box">
+              <div class="ask-label">📝 问法示例</div>
+              <code>@行家助手 AA0192 的MSDS文件</code><br/>
+              <code>@行家助手 AA0192 TDS</code>
+            </div>
+            <div class="ask-box" style="border-left-color:#e74c3c;background:#fff5f5;">
+              <div class="ask-label" style="color:#e74c3c;">📄 返回内容</div>
+              直接发送对应SKU的MSDS/TDS文件（PDF格式），可直接下载保存
+            </div>
+          </div>
+          <div class="screenshot-wrap">
+            <div class="img-label">真实效果</div>
+            <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/207821935/9EIelXA4yyMXFmi8.png?Expires=1792651646&Signature=n8Q~PnSlE3EWCP4PTkCYuGvDlvlVHp8P22-pHCDVB9c12fXUV6IXfsnf2SIfj2bokraJO3unVFP8s6gt-rL6rYTcYAGvOr0gdvrCOFRPOxXi0CDqPrcaOuHAHHlGu3ibGisZbIHKIuUPVw6CNAUDraI8aHG4SNt-3hOmirnWqDiblwhegD6T3K-OYVC9YfdZ0u~kRqVEGqRY0d-mc0VLoxgwMu2WDar7itfva5Q~D0vU~imogRrrQMVHFmWPWsdx7zn5rbNp336hrvWJhxxCvJxyWacbiLSdlp5iinVpgqUor2fOJaiuhyVz-aYV0oenq1ODzMFjztKobY5O~c1Lmg__&Key-Pair-Id=K3USGZIKWMDCSX" alt="查MSDS/TDS"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <div class="footer">
+    <div class="glow-f"></div>
+    <h3>🤖 随时 @行家助手，秒出结果！</h3>
+    <p>全天候在线 · 无需等待客服<br/>找货 · 查物流 · 查发票 · 查交期 · 查文件……一个 @ 搞定！</p>
+    <div class="at-btn">✨ @ 行家助手</div>
+  </div>
+
+  <script>
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = Math.random() * 2.5 + 0.5;
+      s.style.cssText = `
+        width:${size}px;height:${size}px;
+        top:${Math.random()*100}%;left:${Math.random()*100}%;
+        --d:${(Math.random()*4+2).toFixed(1)}s;
+        --o:${(Math.random()*0.7+0.3).toFixed(2)};
+        animation-delay:${(Math.random()*5).toFixed(1)}s;
+      `;
+      container.appendChild(s);
+    }
+  </script>
+</body>
+</html>
